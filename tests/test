@@ -1,0 +1,27 @@
+execute_script tests/update_test
+
+execute_script tests/remove_by_id_test
+
+execute_script tests/add_test
+
+execute_script tests/wrong_add_test
+
+execute_script tests/recursion_test
+
+execute_script tests/basic_commands_test
+
+execute_script tests/add_if_max_test
+
+execute_script tests/remove_greater_test
+
+execute_script tests/remove_lower_test
+
+execute_script tests/count_less_than_genre_test
+
+execute_script tests/filter_contains_name_test
+
+execute_script tests/print_field_ascending_number_of_participants_test
+
+execute_script tests/add_and_save_and_exit
+
+execute_script tests/

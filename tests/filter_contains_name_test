@@ -1,0 +1,27 @@
+FILTER_CONTAINS_NAME_TEST
+clear
+add
+aaaa
+2
+2
+3
+null
+john
+21.02.2019
+null
+120
+null
+add
+aaaaaaaaaa
+2
+2
+3
+null
+john
+21.02.2019
+null
+120
+null
+show
+filter_contains_name aaa
+filter_contains_name aaaaaa

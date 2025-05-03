@@ -1,0 +1,3 @@
+RECURSION_TEST
+info
+execute_script tests/recursion_test

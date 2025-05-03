@@ -1,0 +1,8 @@
+REMOVE_BY_ID_TEST
+show
+remove_by_id 24
+show
+
+show
+remove_by_id WRONG_ID
+show

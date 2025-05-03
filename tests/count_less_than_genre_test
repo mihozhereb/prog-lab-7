@@ -1,0 +1,41 @@
+COUNT_LESS_THAN_GENRE
+clear
+add
+b
+2
+2
+3
+POST_ROCK
+john
+21.02.2019
+null
+120
+null
+add
+c
+2
+2
+3
+POST_PUNK
+john
+21.02.2019
+null
+120
+null
+add
+c
+2
+2
+3
+null
+john
+21.02.2019
+null
+120
+null
+show
+BLUES < POST_PUNK < POST_ROCK < PSYCHEDELIC_ROCK
+count_less_than_genre BLUES
+count_less_than_genre POST_ROCK
+count_less_than_genre PSYCHEDELIC_ROCK
+count_less_than_genre REP
