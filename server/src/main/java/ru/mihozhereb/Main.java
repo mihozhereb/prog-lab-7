@@ -1,11 +1,13 @@
 package ru.mihozhereb;
 
 import ru.mihozhereb.collection.CollectionManager;
+import ru.mihozhereb.collection.DbManager;
 import ru.mihozhereb.collection.StorageBrokenException;
 import ru.mihozhereb.collection.StorageIsNullException;
 import ru.mihozhereb.control.UDPServer;
 import ru.mihozhereb.io.ConsoleWorker;
 
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 public final class Main {
@@ -28,6 +30,15 @@ public final class Main {
             storagePath = args[0];
         }
         CollectionManager.getInstance().setPath(storagePath);
+
+        try {
+            DbManager db = new DbManager(
+                    "jdbc:postgresql://localhost:5433/studs", "s465887", "yzsxbfkR7yNekiMF"
+            );
+            db.SelectBands();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         UDPServer server = new UDPServer(6666);
         new Thread(server).start();

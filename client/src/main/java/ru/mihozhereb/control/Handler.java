@@ -34,7 +34,10 @@ public class Handler {
         String commandType;
 
         commandType = client.sendRequest(
-                new Request("get_command_type", command, null)
+                new Request(
+                        "get_command_type", command, null,
+                        UserData.getUserLogin(), UserData.getUserPassword()
+                )
         ).response();
 
         return CommandType.valueOf(commandType);
@@ -58,7 +61,10 @@ public class Handler {
             }
         }
 
-        Request req = new Request(args[0], args.length == 2 ? args[1] : null, element.orElse(null));
+        Request req = new Request(
+                args[0], args.length == 2 ? args[1] : null, element.orElse(null),
+                UserData.getUserLogin(), UserData.getUserPassword()
+        );
 
         Response resp;
         if (args[0].equals("execute_script")) {
@@ -76,5 +82,9 @@ public class Handler {
         }
 
         return responseText.toString();
+    }
+
+    public UDPClient getClient() {
+        return client;
     }
 }

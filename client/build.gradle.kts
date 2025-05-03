@@ -15,6 +15,11 @@ dependencies {
     implementation(project(":common"))
 }
 
+dependencies {
+    implementation("commons-codec:commons-codec:1.18.0")
+}
+
+
 tasks.test {
     useJUnitPlatform()
 }

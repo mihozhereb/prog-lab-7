@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  * @param element
  * @see MusicBand
  */
-public record Request(String command, String argument, MusicBand element) {
+public record Request(String command, String argument, MusicBand element, String login, String password) {
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())

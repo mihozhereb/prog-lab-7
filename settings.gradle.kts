@@ -1,4 +1,4 @@
-rootProject.name = "prog-lab-6"
+rootProject.name = "prog-lab-7"
 include("client")
 include("server")
 include("common")
