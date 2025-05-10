@@ -21,6 +21,12 @@ public class UDPClient {
         DatagramPacket outMetaPacket = new DatagramPacket(outMetaBuffer, outMetaBuffer.length);
         ds.send(outMetaPacket);
 
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        }
+
         byte[] outBuffer = msg.getBytes();
         DatagramPacket outPacket = new DatagramPacket(outBuffer, outBuffer.length);
         ds.send(outPacket);

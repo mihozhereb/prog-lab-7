@@ -5,13 +5,12 @@ import ru.mihozhereb.collection.model.MusicBand;
 import ru.mihozhereb.control.Request;
 import ru.mihozhereb.control.Response;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class UpdateCommand implements Command {
     @Override
     public Response execute(Request r) {
-        CollectionManager c = CollectionManager.getInstance();
-
         int id;
         try {
             id = Integer.parseInt(r.argument());
@@ -19,9 +18,12 @@ public class UpdateCommand implements Command {
             return new Response("Error. Invalid id.", null);
         }
 
-        c.getCollection().removeIf(n -> n.getId().equals(id));
-        r.element().setIdManually(id);
-        c.getCollection().add(r.element());
+        r.element().setId(id);
+        try {
+            CollectionManager.getInstance().update(r.element());
+        } catch (SQLException e) {
+            return new Response("Error. " + e.getMessage(), null);
+        }
         return new Response("Done.", null);
     }
 

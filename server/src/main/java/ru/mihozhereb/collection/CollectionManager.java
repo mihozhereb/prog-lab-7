@@ -6,11 +6,10 @@ import ru.mihozhereb.collection.model.MusicBand;
 import ru.mihozhereb.io.FileWorker;
 import ru.mihozhereb.io.JsonWorker;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 /**
@@ -18,13 +17,14 @@ import java.util.logging.Logger;
  */
 public final class CollectionManager {
     private static final TreeSet<MusicBand> COLLECTION = new TreeSet<>();
-    private static String path;
     private static final LocalDateTime CREATION_DATE_TIME = LocalDateTime.now();
     private final static Logger LOGGER = Logger.getLogger(CollectionManager.class.getName());
 
     private CollectionManager() {  }
 
     private static CollectionManager instance;
+    private DbManager db;
+    private static final ReentrantLock locker = new ReentrantLock();
 
     /**
      * Return instance of {@code CollectionManager}
@@ -43,55 +43,19 @@ public final class CollectionManager {
      *
      * @return MusicBand's collection
      */
-    public TreeSet<MusicBand> getCollection() {
-        return COLLECTION;
+    public NavigableSet<MusicBand> getCollection() {
+        return Collections.unmodifiableNavigableSet(COLLECTION);
     }
 
     /**
      * Load collection from file
      */
-    public void load() throws StorageBrokenException, StorageIsNullException {
-        try (JsonWorker storage = new JsonWorker(path);
-             FileWorker hashStorage = new FileWorker("STORAGE_HASH", true)) {
-            if (storage.ready() && hashStorage.ready()) {
-                MusicBand[] storageInner = storage.read();
-
-                if (storageInner == null) {
-                    return;
-                }
-
-                String fileHash = DigestUtils.sha256Hex(Arrays.toString(storageInner) + "MY SUPER SECRET PEPPER");
-
-                if (!Objects.equals(hashStorage.read(), fileHash)) {
-                    throw new StorageBrokenException("Collection's storage broken");
-                }
-
-                COLLECTION.addAll(List.of(storageInner));
-            } else {
-                throw new StorageIsNullException("Collection's storage or hash file is not ready");
-            }
-        }
+    public void load(DbManager dbm) throws SQLException {
+        db = dbm;
+        locker.lock();
+        COLLECTION.addAll(db.selectMusicBands());
+        locker.unlock();
         LOGGER.info("Storage loaded");
-    }
-
-    /**
-     * Save collection in file (json format)
-     */
-    public void save() {
-        try (JsonWorker storage = new JsonWorker(path);
-             FileWorker hashStorage = new FileWorker("STORAGE_HASH", false)) {
-            storage.write(COLLECTION.toArray(new MusicBand[0]));
-            hashStorage.write(DigestUtils.sha256Hex(COLLECTION + "MY SUPER SECRET PEPPER"));
-        }
-        LOGGER.info("Storage saved");
-    }
-
-    /**
-     * Set new path to back up file
-     * @param newPath new path
-     */
-    public void setPath(String newPath) {
-        path = newPath;
     }
 
     /**
@@ -103,7 +67,35 @@ public final class CollectionManager {
         return CREATION_DATE_TIME;
     }
 
-    public int getLastIdInCollection() {
-        return COLLECTION.stream().mapToInt(MusicBand::getId).max().orElse(0);
+    public void add(MusicBand mb) throws SQLException {
+        db.insertMusicBand(mb);
+        locker.lock();
+        COLLECTION.clear();
+        COLLECTION.addAll(db.selectMusicBands());
+        locker.unlock();
+    }
+
+    public void remove(int ownerId, int MBId) throws SQLException {
+        db.removeMusicBand(ownerId, MBId);
+        locker.lock();
+        COLLECTION.clear();
+        COLLECTION.addAll(db.selectMusicBands());
+        locker.unlock();
+    }
+
+    public void remove(int ownerId) throws SQLException {
+        db.removeMusicBand(ownerId);
+        locker.lock();
+        COLLECTION.clear();
+        COLLECTION.addAll(db.selectMusicBands());
+        locker.unlock();
+    }
+
+    public void update(MusicBand newMB) throws SQLException {
+        db.updateMusicBand(newMB);
+        locker.lock();
+        COLLECTION.clear();
+        COLLECTION.addAll(db.selectMusicBands());
+        locker.unlock();
     }
 }

@@ -20,7 +20,7 @@ public class UDPServer implements Runnable {
     private final int port;
     private final static Logger LOGGER = Logger.getLogger(UDPServer.class.getName());
 
-    private final ExecutorService readPool = newFixedThreadPool(10);
+    private final ExecutorService readPool = newFixedThreadPool(1);
     private final ForkJoinPool processPool = ForkJoinPool.commonPool();
     private final ExecutorService writePool = newCachedThreadPool();
 
@@ -48,11 +48,22 @@ public class UDPServer implements Runnable {
 
                     if (sk.isValid()) {
                         if (sk.isReadable()) {
-                            if (sk.attachment() != null) {
-                                readPool.execute(new ReadData(sk));
-                            } else {
-                                readPool.execute(new ReadMeta(sk));
+                            try {
+                                if (sk.attachment() != null) {
+                                    int size = ((ClientData) sk.attachment()).bf.flip().getInt();
+                                    ByteBuffer reqBuffer = ByteBuffer.allocate(size);
+                                    dc.receive(reqBuffer);
+                                    readPool.execute(new ReadData(sk, reqBuffer));
+                                } else {
+                                    ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
+                                    SocketAddress client;
+                                    client = dc.receive(sizeBuffer);
+                                    readPool.execute(new ReadMeta(sk, sizeBuffer, client));
+                                }
+                            } catch (IOException e) {
+                                LOGGER.warning("Failed to read datagram");
                             }
+
                         }
                     }
                 }
@@ -66,19 +77,17 @@ public class UDPServer implements Runnable {
 
     private class ReadMeta implements Runnable {
         SelectionKey sk;
-        public ReadMeta(SelectionKey sk) {this.sk = sk;}
+        ByteBuffer sizeBuffer;
+        SocketAddress client;
+        public ReadMeta(SelectionKey sk, ByteBuffer sizeBuffer, SocketAddress client) {
+            this.sk = sk;
+            this.sizeBuffer = sizeBuffer;
+            this.client = client;
+        }
         @Override
         public void run() {
             LOGGER.info("Read meta datagram");
-            ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
             DatagramChannel dc = (DatagramChannel) sk.channel();
-            SocketAddress client;
-            try {
-                client = dc.receive(sizeBuffer);
-            } catch (IOException e) {
-                LOGGER.warning("Failed to read meta datagram");
-                return;
-            }
 
             try {
                 dc.register(sk.selector(), SelectionKey.OP_READ, new ClientData(dc, client, sizeBuffer));
@@ -91,21 +100,15 @@ public class UDPServer implements Runnable {
     private class ReadData implements Runnable {
         ClientData cd;
         SelectionKey sk;
-        public ReadData(SelectionKey sk) {
+        ByteBuffer reqBuffer;
+        public ReadData(SelectionKey sk, ByteBuffer reqBuffer) {
             this.sk = sk;
             this.cd = (ClientData) sk.attachment();
+            this.reqBuffer = reqBuffer;
         }
         @Override
         public void run() {
             LOGGER.info("Read datagram");
-            int size = cd.bf.flip().getInt();
-            ByteBuffer reqBuffer = ByteBuffer.allocate(size);
-            try {
-                cd.dc.receive(reqBuffer);
-            } catch (IOException e) {
-                LOGGER.warning("Failed to read the datagram");
-                return;
-            }
 
             try {
                 cd.dc.register(sk.selector(), SelectionKey.OP_READ);

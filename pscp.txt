@@ -1,7 +1,7 @@
 pscp -r -P 2222 "C:\Users\user\Desktop\дз\прога\prog-lab-5\build\libs\prog-lab-5-1.0-SNAPSHOT.jar" s465887@helios.cs.ifmo.ru:/home/studs/s465887/proga/lab5
 
-pscp -r -P 2222 "C:\Users\pro\Desktop\дз\прога\prog-lab-6\client\build\libs\client-1.0-SNAPSHOT.jar" s465887@helios.cs.ifmo.ru:/home/studs/s465887/proga/lab6
-pscp -r -P 2222 "C:\Users\pro\Desktop\дз\прога\prog-lab-6\server\build\libs\server-1.0-SNAPSHOT.jar" s465887@helios.cs.ifmo.ru:/home/studs/s465887/proga/lab6
+pscp -r -P 2222 "C:\Users\pro\Desktop\дз\прога\prog-lab-7\client\build\libs\client-1.0-SNAPSHOT.jar" s465887@helios.cs.ifmo.ru:/home/studs/s465887/proga/lab7
+pscp -r -P 2222 "C:\Users\pro\Desktop\дз\прога\prog-lab-7\server\build\libs\server-1.0-SNAPSHOT.jar" s465887@helios.cs.ifmo.ru:/home/studs/s465887/proga/lab7
 
 pscp -r -P 2222 "C:\Users\pro\Desktop\дз\прога\prog-lab-6\storage.json" s465887@helios.cs.ifmo.ru:/home/studs/s465887/proga/lab6
 

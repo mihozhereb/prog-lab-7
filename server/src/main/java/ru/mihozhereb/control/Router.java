@@ -17,6 +17,11 @@ public class Router {
      * @return {@code Response} object
      */
     public static Response route(Request r) {
+        if (!r.command().equals("get_command_type") && !r.command().equals("register")
+                && UserManager.getInstance().getUserId(r.login(), r.password()) == -1) {
+            return new Response("Not authorized.", null);
+        }
+
         if (r.command().equals("help")) {
             return new Response(helpCommand(), null);
         }
@@ -27,8 +32,7 @@ public class Router {
             return new Response("Command not found.", null);
         }
         if (r.element() != null) {
-            r.element().setId(CollectionManager.getInstance().getLastIdInCollection());
-            r.element().setCreationDate(LocalDateTime.now());
+            r.element().setOwnerId(UserManager.getInstance().getUserId(r.login(), r.password()));
         }
 
         return command.execute(r);

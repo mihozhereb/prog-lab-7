@@ -1,13 +1,8 @@
 package ru.mihozhereb.collection.model;
 
-import ru.mihozhereb.collection.utils.IdGenerator;
 import ru.mihozhereb.io.Formatters;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -72,6 +67,8 @@ public class MusicBand implements Comparable<MusicBand> {
         creationDate = LocalDateTime.now();
     }
 
+    private int ownerId;
+
     /**
      * Get MusicBand's ID
      *
@@ -84,14 +81,7 @@ public class MusicBand implements Comparable<MusicBand> {
     /**
      * Set MusicBand's ID
      */
-    public void setId(int lastIdInCollection) {
-        id = IdGenerator.getInstance().getNewId(lastIdInCollection);
-    }
-
-    /**
-     * Set MusicBand's ID manually
-     */
-    public void setIdManually(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -233,12 +223,12 @@ public class MusicBand implements Comparable<MusicBand> {
         return numberOfParticipants == musicBand.numberOfParticipants && Objects.equals(id, musicBand.id) &&
                 Objects.equals(name, musicBand.name) && Objects.equals(coordinates, musicBand.coordinates) &&
                 Objects.equals(creationDate, musicBand.creationDate) && genre == musicBand.genre &&
-                Objects.equals(frontMan, musicBand.frontMan);
+                Objects.equals(frontMan, musicBand.frontMan) && ownerId == musicBand.ownerId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, coordinates, creationDate, numberOfParticipants, genre, frontMan);
+        return Objects.hash(id, name, coordinates, creationDate, numberOfParticipants, genre, frontMan, ownerId);
     }
 
     @Override
@@ -257,6 +247,7 @@ public class MusicBand implements Comparable<MusicBand> {
                 System.lineSeparator() + "\tfrontMan.height=" + frontMan.getHeight() + "," +
                 System.lineSeparator() + "\tfrontMan.weight=" + frontMan.getWeight() + "," +
                 System.lineSeparator() + "\tfrontMan.hairColor=" + frontMan.getHairColor() + "," +
+                System.lineSeparator() + "\townerId=" + ownerId + "," +
                 System.lineSeparator() + '}';
     }
 
@@ -274,5 +265,13 @@ public class MusicBand implements Comparable<MusicBand> {
         result = this.frontMan.getName().compareToIgnoreCase(other.frontMan.getName());
         if (result != 0) return result;
         return Long.compare(this.numberOfParticipants, other.numberOfParticipants);
+    }
+
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
     }
 }

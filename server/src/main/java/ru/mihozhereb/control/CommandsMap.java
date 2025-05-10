@@ -27,6 +27,7 @@ public class CommandsMap {
         COMMANDS.put("print_field_ascending_number_of_participants",
                 new PrintFieldAscendingNumberOfParticipantsCommand());
         COMMANDS.put("get_command_type", new GetCommandTypeCommand());
+        COMMANDS.put("register", new RegisterCommand());
     }
 
     /**
